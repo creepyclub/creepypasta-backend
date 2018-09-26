@@ -5,6 +5,15 @@ It's a backend.
 ### Run in docker
 
 ```bash
+docker network create --driver bridge creepypasta-network
+docker run --rm \
+    -v `pwd`/postgres:/var/lib/postgresql/data \
+    --network creepypasta-network \
+    --name creepypasta-postgres \
+    -e POSTGRES_DB=mycreepypastadb \
+    -e POSTGRES_USER=mycreepypastauser \
+    -e POSTGRES_PASSWORD=mycreepypastapassword \
+    -d postgres:10.5-alpine
 docker build -t creepypasta .
-docker run -d -p 9000:9000 --name creepypasta creepypasta:latest .
+docker run -d -p 9000:9000 --network creepypasta-network --name creepypasta creepypasta:latest .
 ```
