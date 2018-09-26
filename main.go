@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/gin-gonic/gin"
 
@@ -20,9 +21,13 @@ func TopicsHandler(c *gin.Context) {
 
 func main() {
 	r := gin.Default()
+	address := os.Getenv("CREEPYPASTA_ADDRESS")
+	if address == "" {
+		address = ":9000"
+	}
 
 	v1 := r.Group("/v1")
 	v1.GET("/topics", TopicsHandler)
 
-	log.Fatal(r.Run("localhost:9000"))
+	log.Fatal(r.Run(address))
 }
