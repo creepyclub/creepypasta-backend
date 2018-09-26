@@ -6,6 +6,7 @@ It's a backend.
 
 ```bash
 docker network create --driver bridge creepypasta-network
+
 docker run --rm \
     -v `pwd`/postgres:/var/lib/postgresql/data \
     --network creepypasta-network \
@@ -14,6 +15,13 @@ docker run --rm \
     -e POSTGRES_USER=mycreepypastauser \
     -e POSTGRES_PASSWORD=mycreepypastapassword \
     -d postgres:10.5-alpine
+    
 docker build -t creepypasta .
-docker run -d -p 9000:9000 --network creepypasta-network --name creepypasta creepypasta:latest .
+
+docker run --rm \
+    -e GIN_MODE=release \
+    -p 9000:9000 \
+    --network creepypasta-network \
+    --name creepypasta \
+    -d creepypasta:latest .
 ```

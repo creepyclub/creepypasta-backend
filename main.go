@@ -2,17 +2,16 @@ package main
 
 import (
 	"log"
-	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
-func MainHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Creepypasta home!\n"))
+func MainHandler(c *gin.Context) {
+	c.String(200, "pong")
 }
 
 func main() {
-	r := mux.NewRouter()
-	r.HandleFunc("/", MainHandler)
-	log.Fatal(http.ListenAndServe(":9000", r))
+	r := gin.Default()
+	r.GET("/", MainHandler)
+	log.Fatal(r.Run("localhost:9000"))
 }
