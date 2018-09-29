@@ -91,7 +91,7 @@ func GetTopic(c *gin.Context) {
 		}
 		return
 	}
-	c.JSON(http.StatusOK, topic)
+	c.PureJSON(http.StatusOK, topic)
 }
 
 func main() {
