@@ -5,6 +5,7 @@ package roach
 import (
 	"database/sql"
 	"fmt"
+	"log"
 
 	"github.com/davecgh/go-spew/spew"
 	"github.com/pkg/errors"
@@ -80,6 +81,10 @@ func New(cfg Config) (roach Roach, err error) {
 	}
 
 	roach.Db = db
+	err = roach.applyMigrations()
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 	return
 }
 
