@@ -1,7 +1,5 @@
 package roach
 
-import "log"
-
 const migrationTable = "creepypasta_migrations"
 
 func (r *Roach) applyMigrations() error {
@@ -15,7 +13,23 @@ func (r *Roach) applyMigrations() error {
 	}
 	switch lastMigrationId {
 	case 0:
-		//r.updateMigrationId(1)
+		_, err = trx.Exec("CREATE TABLE topics (" +
+			"topic_id BIGSERIAL PRIMARY KEY NOT NULL," +
+			"topic_title VARCHAR(250) NOT NULL," +
+			"topic_slug VARCHAR(500) NOT NULL DEFAULT ''," +
+			"topic_text TEXT NOT NULL," +
+			"topic_text_source TEXT NOT NULL," +
+			"topic_text_hash VARCHAR(32) NOT NULL)")
+		if err != nil {
+			return err
+		}
+		err = r.updateMigrationId(1)
+		if err != nil {
+			return err
+		}
+		fallthrough
+	case 1:
+		//r.updateMigrationId(2)
 		//fallthrough
 	}
 	return trx.Commit()

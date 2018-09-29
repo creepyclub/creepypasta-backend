@@ -1,9 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 
@@ -12,7 +14,7 @@ import (
 )
 
 var (
-	db      roach.Roach
+	db      *sql.DB
 	address string
 )
 
@@ -45,23 +47,59 @@ func init() {
 	if err != nil {
 		log.Panic(err.Error())
 	} else {
-		db = roach
+		db = roach.Db
 	}
 }
 
-func TopicsHandler(c *gin.Context) {
-	topics := []models.Topic{
-		models.Topic{ID: 1, Title: "Крипота", Text: "здесь будет текст"},
-		models.Topic{ID: 2, Title: "Начинает свою", Text: "здесь будет текст"},
-		models.Topic{ID: 3, Title: "Жизнь на go", Text: "здесь будет текст"},
+func GetTopics(c *gin.Context) {
+	topics, err := models.GetAllTopics(db)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
-	c.JSON(http.StatusOK, topics)
+	c.PureJSON(http.StatusOK, topics)
+}
+
+func AddTopic(c *gin.Context) {
+	var topic models.Topic
+	err := c.BindJSON(&topic)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	topicId, err := topic.Save(db)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"id": topicId})
+}
+
+func GetTopic(c *gin.Context) {
+	stringID := c.Params.ByName("id")
+	id, err := strconv.Atoi(stringID)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	topic, err := models.GetTopicByID(id, db)
+	if err != nil {
+		if err.Error() == "sql: no rows in result set" {
+			c.JSON(http.StatusNotFound, gin.H{"error": "topic not found"})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		return
+	}
+	c.JSON(http.StatusOK, topic)
 }
 
 func main() {
 	r := gin.Default()
 	v1 := r.Group("/v1")
-	v1.GET("/topics", TopicsHandler)
+	v1.GET("/topics", GetTopics)
+	v1.GET("/topic/:id", GetTopic)
+	v1.POST("/topics", AddTopic)
 
 	r.Run(address)
 	db.Close()
