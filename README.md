@@ -20,6 +20,7 @@ docker build -t creepypasta .
 
 docker run --rm \
     -e GIN_MODE=release \
+    -e CREEPYPASTA_POSTGRES_HOST=`docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' creepypasta-postgres` \
     -p 9000:9000 \
     --network creepypasta-network \
     --name creepypasta \
