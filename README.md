@@ -2,6 +2,23 @@
 
 It's a backend.
 
+### Run locally
+
+Install [PostgreSQL](https://www.postgresql.org/download/) and configure settings:
+
+- db name: `mycreepypastadb`
+- user: `mycreepypastauser`
+- password: `mycreepypastapassword`
+
+after that run commands:
+
+```bash
+go get github.com/creepypasta-club/creepypasta-backend
+cd $GOPATH/src/github.com/creepypasta-club/creepypasta-backend
+go build
+./creepypasta-backend
+```
+
 ### Run in docker
 
 ```bash

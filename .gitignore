@@ -1,2 +1,4 @@
 /bin/*
 /postgres/*
+.idea/*
+creepypasta-backend
