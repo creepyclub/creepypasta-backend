@@ -29,7 +29,30 @@ func (r *Roach) applyMigrations() error {
 		}
 		fallthrough
 	case 1:
-		//r.updateMigrationId(2)
+		_, err = trx.Exec("CREATE TABLE users (" +
+			"user_id BIGSERIAL PRIMARY KEY NOT NULL," +
+			"user_login VARCHAR(32) NOT NULL," +
+			"user_password VARCHAR(255) NOT NULL DEFAULT ''," +
+			"user_email VARCHAR(255) NOT NULL," +
+			"user_role SMALLINT NOT NULL DEFAULT 0," +
+			"user_active BOOLEAN NOT NULL DEFAULT FALSE)")
+		if err != nil {
+			return err
+		}
+		_, err = trx.Exec("INSERT INTO users "+
+			"(user_login, user_password, user_email, user_role, user_active) "+
+			"VALUES ($1, MD5($2), $3, $4, $5)",
+			"admin", "admin_change_your_password", "admin@admin.adm", 1, true)
+		if err != nil {
+			return err
+		}
+		err = r.updateMigrationId(2)
+		if err != nil {
+			return err
+		}
+		fallthrough
+	case 2:
+		//r.updateMigrationId(3)
 		//fallthrough
 	}
 	return trx.Commit()

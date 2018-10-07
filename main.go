@@ -94,12 +94,23 @@ func GetTopic(c *gin.Context) {
 	c.PureJSON(http.StatusOK, topic)
 }
 
+func GetUsers(c *gin.Context) {
+	users, err := models.GetAllUsers(db)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	c.PureJSON(http.StatusOK, users)
+}
+
 func main() {
 	r := gin.Default()
 	v1 := r.Group("/v1")
 	v1.GET("/topics", GetTopics)
-	v1.GET("/topic/:id", GetTopic)
+	v1.GET("/topics/:id", GetTopic)
 	v1.POST("/topics", AddTopic)
+
+	v1.GET("/users", GetUsers)
 
 	r.Run(address)
 	db.Close()
